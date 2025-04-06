@@ -1,4 +1,5 @@
 import React,{useState,useEffect} from 'react'
+import { useDebounce } from 'react-use'
 import Search from './components/Search'
 import Spinner from './components/Spinner'
 import MovieCard from './components/MovieCard'
@@ -15,11 +16,12 @@ const API_OPTIONS={
 }
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
-  
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [movieList, setMovieList] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+ // Debounce the search term to prevent making too many API requests-wait 500ms
+  useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm])
 const fetchMovies=async(query="")=>{
   setIsLoading(true);
   setErrorMessage('');
@@ -53,8 +55,8 @@ const fetchMovies=async(query="")=>{
 }
 
   useEffect(()=>{
-    fetchMovies(searchTerm)
-  },[searchTerm])
+    fetchMovies(debouncedSearchTerm)
+  },[debouncedSearchTerm])
   return (
     <main>
       <div className='pattern'/>
